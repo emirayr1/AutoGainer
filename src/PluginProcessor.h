@@ -19,7 +19,7 @@ class AutoGainerAudioProcessor;
 
 struct PluginHub
 {
-  // Store active plugin instances
+  // Store active plugin instances !!!!!!!!!!!!!!!! STATIC LIST
   static std::vector<AutoGainerAudioProcessor*> instances;
 
   // Lock for thread safety
