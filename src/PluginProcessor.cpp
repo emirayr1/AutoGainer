@@ -162,6 +162,13 @@ void AutoGainerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
         measurementCount++;
 
+        float currentMagnitude = buffer.getMagnitude(0, 0, buffer.getNumSamples());
+        float storedPeak = maxPeak.load();
+        if(currentMagnitude > storedPeak)
+        {
+            maxPeak.store(currentMagnitude);
+        }
+
         currentRMS.store(currentLevel);
     }
 

@@ -71,6 +71,7 @@ void AutoGainerAudioProcessorEditor::timerCallback()
       analyzeButton.setButtonText("ANALYZE & MATCH (-18dB)");
 
       const float targetLinear = juce::Decibels::decibelsToGain(-18.0f);
+      const float maxPeakLinear = juce::Decibels::decibelsToGain(-6.0f);
 
       const juce::ScopedLock sl(PluginHub::instanceLock);
 
@@ -79,18 +80,22 @@ void AutoGainerAudioProcessorEditor::timerCallback()
         plugin->stopAnalysis();
 
         float totalRMS = plugin->accumulatedRMS.load();
+        float maxPeakValue = plugin->maxPeak.load();
         int count = plugin->measurementCount.load();
 
         if(count > 0 && totalRMS > 0.0001f)
         {
           float averageRMS = totalRMS / (float)count;
 
-          float neededGain = targetLinear / averageRMS;
+          if(averageRMS < 0.0001f) averageRMS = 0.0001f;
+          if(maxPeakValue < 0.0001f) maxPeakValue = 0.0001f;
 
-          // Safety
-          neededGain = juce::jmin(neededGain, juce::Decibels::decibelsToGain(24.0f));
+          float gainForRMS = targetLinear / averageRMS;
+          float gainForPeak = maxPeakLinear / maxPeakValue;
 
-          plugin->gainToApply.store(neededGain);
+          float finalGain = juce::jmin(gainForRMS, gainForPeak);
+
+          plugin->gainToApply.store(finalGain);
         }
       }
     }

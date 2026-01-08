@@ -84,6 +84,7 @@ public:
     {
       accumulatedRMS.store(0.0f);
       measurementCount.store(0);
+      maxPeak.store(0.0f);
       isAnalyzing.store(true);
     }
 
@@ -101,6 +102,9 @@ public:
 
     // Current Calculated RMS Level 
     std::atomic<float> currentRMS {0.0f};
+
+    // MaxPeak
+    std::atomic<float> maxPeak{0.0f};
 
     // Gain to apply
     std::atomic<float> gainToApply {1.0f};
